@@ -1,7 +1,10 @@
 # GIFTI
 
-[![Build Status](https://travis-ci.org/rdeits/GIFTI.jl.svg?branch=master)](https://travis-ci.org/rdeits/GIFTI.jl)
+This package includes very basic support for loading GIFTI (`.gii`) files in Julia. Currently only the surface mesh can be extracted, represented as a `HomogeneousMesh` from [GeometryTypes.jl](https://github.com/JuliaGeometry/GeometryTypes.jl).
 
-[![Coverage Status](https://coveralls.io/repos/rdeits/GIFTI.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/rdeits/GIFTI.jl?branch=master)
+## Usage
 
-[![codecov.io](http://codecov.io/github/rdeits/GIFTI.jl/coverage.svg?branch=master)](http://codecov.io/github/rdeits/GIFTI.jl?branch=master)
+```julia
+using GIFTI
+mesh = GIFTI.load(open("data.gii"))
+```
