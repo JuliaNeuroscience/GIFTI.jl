@@ -9,3 +9,6 @@ LightXML = "9c8b4983-aa76-5018-a973-4c85ecc9e179"
 
 [compat]
 julia = "0.7, 1"
+CodecZlib = "0.5, 0.6"
+GeometryTypes = "0.6, 0.7"
+LightXML = "0.6, 0.7, 0.8"
