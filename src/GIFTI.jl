@@ -3,6 +3,7 @@ module GIFTI
 using LightXML
 using GeometryTypes: HomogenousMesh, Point3f0, Face, OffsetInteger
 using CodecZlib: transcode, GzipDecompressor
+using Base64: base64decode
 
 load(io::IO) = parse_gifti_mesh(parse_string(readstring(io)))
 load(fname::String) = parse_gifti_mesh(parse_file(fname))
@@ -53,10 +54,10 @@ function parse_nifti_data_array(xml)
     data = parse_nifti_array_data(xml)
     order = attribute(xml, "ArrayIndexingOrder")
     if order == "RowMajorOrder"
-        array = reinterpret(T, data, reverse(dims))
+        array = reshape(reinterpret(T, data), reverse(dims))
     else
         @assert order = "ColumnMajorOrder"
-        array = reinterpret(T, data, dims)
+        array = reshape(reinterpret(T, data), dims)
     end
     endian = attribute(xml, "Endian")
     if endian == "LittleEndian"
@@ -92,8 +93,8 @@ function parse_gifti_mesh(xml::XMLElement)
 
     vert_array = parse_nifti_data_array(pointset) ./ 100
     face_array = parse_nifti_data_array(triangles)
-    vertices = reinterpret(Point3f0, vert_array, (size(vert_array, 2),))
-    faces = reinterpret(Face{3, OffsetInteger{-1, Int32}}, face_array, (size(face_array, 2),));
+    vertices = reshape(reinterpret(Point3f0, vert_array), (size(vert_array, 2),))
+    faces = reshape(reinterpret(Face{3, OffsetInteger{-1, Int32}}, face_array), (size(face_array, 2),));
     mesh = HomogenousMesh(vertices, faces)
 end
 
