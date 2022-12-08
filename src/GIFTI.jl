@@ -1,11 +1,12 @@
 module GIFTI
 
 using LightXML
-using GeometryTypes: HomogenousMesh, Point3f0, Face, OffsetInteger
+using GeometryBasics
 using CodecZlib: transcode, GzipDecompressor
 using Base64: base64decode
+using LinearAlgebra
 
-load(io::IO) = parse_gifti_mesh(parse_string(readstring(io)))
+load(io::IO) = parse_gifti_mesh(parse_string(read(io, String)))
 load(fname::String) = parse_gifti_mesh(parse_file(fname))
 
 function parse_nifti_datatype(Tstr::String)
@@ -93,9 +94,21 @@ function parse_gifti_mesh(xml::XMLElement)
 
     vert_array = parse_nifti_data_array(pointset) ./ 100
     face_array = parse_nifti_data_array(triangles)
+
+    # vertices = reshape(reinterpret(Point3f0, vert_array), (size(vert_array, 2),))
+    # faces = reshape(reinterpret(Face{3, OffsetInteger{-1, Int32}}, face_array), (size(face_array, 2),));
+    # mesh = HomogenousMesh(vertices, faces)
+    # vert_array, face_array
     vertices = reshape(reinterpret(Point3f0, vert_array), (size(vert_array, 2),))
-    faces = reshape(reinterpret(Face{3, OffsetInteger{-1, Int32}}, face_array), (size(face_array, 2),));
-    mesh = HomogenousMesh(vertices, faces)
+    if 0 ∈ face_array
+        face_array = face_array .+ 1 
+        faces = Vector{GeometryBasics.TriangleFace{Int32}}()
+        for face in eachcol(face_array)
+            push!(faces, face) #reinterpret(TriangleFace{Int32}, ff[:,i])[1])
+        end
+        faces
+    end
+    GeometryBasics.Mesh(meta(vertices; normals=normalize.(vertices)), faces)
 end
 
 parse_gifti_mesh(doc::XMLDocument) = parse_gifti_mesh(root(doc))
