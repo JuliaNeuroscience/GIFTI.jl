@@ -95,19 +95,8 @@ function parse_gifti_mesh(xml::XMLElement)
     vert_array = parse_nifti_data_array(pointset) ./ 100
     face_array = parse_nifti_data_array(triangles)
 
-    # vertices = reshape(reinterpret(Point3f0, vert_array), (size(vert_array, 2),))
-    # faces = reshape(reinterpret(Face{3, OffsetInteger{-1, Int32}}, face_array), (size(face_array, 2),));
-    # mesh = HomogenousMesh(vertices, faces)
-    # vert_array, face_array
     vertices = reshape(reinterpret(Point3f0, vert_array), (size(vert_array, 2),))
-    if 0 ∈ face_array
-        face_array = face_array .+ 1 
-        faces = Vector{GeometryBasics.TriangleFace{Int32}}()
-        for face in eachcol(face_array)
-            push!(faces, face) #reinterpret(TriangleFace{Int32}, ff[:,i])[1])
-        end
-        faces
-    end
+    faces = [TriangleFace(reinterpret(OffsetInteger{-1, Int32}, face)) for face in eachcol(face_array)]
     GeometryBasics.Mesh(meta(vertices; normals=normalize.(vertices)), faces)
 end
 
