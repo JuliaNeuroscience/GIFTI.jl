@@ -96,7 +96,7 @@ function parse_gifti_mesh(xml::XMLElement)
     face_array = parse_nifti_data_array(triangles)
 
     vertices = reshape(reinterpret(Point3f0, vert_array), (size(vert_array, 2),))
-    faces = [TriangleFace(reinterpret(OffsetInteger{-1, Int32}, face)) for face in eachcol(face_array)]
+    faces = [TriangleFace(face) for face in eachcol(reinterpret(OffsetInteger{-1, Int32}, face_array))]
     GeometryBasics.Mesh(meta(vertices; normals=normalize.(vertices)), faces)
 end
 
