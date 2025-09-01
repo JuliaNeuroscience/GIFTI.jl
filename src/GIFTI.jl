@@ -95,9 +95,9 @@ function parse_gifti_mesh(xml::XMLElement)
     vert_array = parse_nifti_data_array(pointset) ./ 100
     face_array = parse_nifti_data_array(triangles)
 
-    vertices = reshape(reinterpret(Point3f0, vert_array), (size(vert_array, 2),))
+    vertices = reshape(reinterpret(Point3f, vert_array), (size(vert_array, 2),))
     faces = reinterpret(GLTriangleFace, vec(face_array))
-    GeometryBasics.Mesh(meta(vertices; normals=normalize.(vertices)), faces)
+    GeometryBasics.Mesh(vertices, faces)
 end
 
 parse_gifti_mesh(doc::XMLDocument) = parse_gifti_mesh(root(doc))
